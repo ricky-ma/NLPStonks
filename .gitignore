@@ -1,0 +1,12 @@
+.idea/.gitignore
+.idea/StockMarketPrediction.iml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/rGraphicsSettings.xml
+.idea/rSettings.xml
+.ipynb_checkpoints/
+__pycache__/
+tmp/
+venv/
+.idea/vcs.xml
