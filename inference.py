@@ -6,21 +6,26 @@ import yfinance as yf
 import tensorflow as tf
 import tensorflow_hub as hub
 from sklearn.decomposition import PCA
+from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=Path("..") / ".env")
-reddit = praw.Reddit(
-    client_id=os.getenv("CLIENT_ID"),
-    client_secret=os.getenv("CLIENT_SECRET"),
-    user_agent=os.getenv("USER_AGENT"),
-)
+load_dotenv(dotenv_path=".env")
 
 
-def predict():
+def load_headlines(n_headlines=22):
+    reddit = praw.Reddit(
+        client_id=os.getenv("CLIENT_ID"),
+        client_secret=os.getenv("CLIENT_SECRET"),
+        user_agent=os.getenv("USER_AGENT"),
+    )
+    headlines_urls = []
+    for submission in reddit.subreddit("WorldNews").top(time_filter='day', limit=n_headlines):
+        headlines_urls.append([submission.title, submission.url])
+    return headlines_urls
+
+
+def predict(news):
     n_comp = 20
     n_headlines = 22
-    news = []
-    for submission in reddit.subreddit("WorldNews").top(time_filter='day', limit=n_headlines):
-        news.append(submission.title)
 
     embedder = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
     embeddings = np.array(embedder(news))
@@ -39,5 +44,3 @@ def predict():
     loaded_model = tf.keras.models.load_model('tmp/model')
     pred = loaded_model.predict(data)
     return pred[0][0]
-
-predict()
