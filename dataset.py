@@ -4,7 +4,6 @@ import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-from umap import UMAP
 
 N = 1989
 
@@ -19,29 +18,25 @@ def get_dataset(n_comp=2):
         df['Lag-2'] = df['DIJA'].shift(2)
         df['Lag-3'] = df['DIJA'].shift(3)
         df['Lag-4'] = df['DIJA'].shift(4)
-        df['Lag-5'] = df['DIJA'].shift(5)
-        df['Lag-6'] = df['DIJA'].shift(6)
-        df['Lag-7'] = df['DIJA'].shift(7)
+
+    train_mean = train.mean()
+    train_std = train.std()
+    train = (train - train_mean) / train_std
+    val = (val - train_mean) / train_std
+    test = (test - train_mean) / train_std
 
     for i, filename in enumerate(os.listdir('data/embeddings')):
         with open('data/embeddings/{}'.format(filename), 'rb') as f:
             embeddings = np.load(f)
         pca = PCA(n_components=n_comp)
         embeddings = pca.fit_transform(X=embeddings)
-        # umap = UMAP(n_components=n_comp)
-        # embeddings = umap.fit_transform(X=embeddings)
         for c in range(n_comp):
             column = 'Top{}_{}'.format(i+1, c+1)
             train[column] = embeddings[:, c][0:int(N * 0.7)]
             val[column] = embeddings[:, c][int(N * 0.7):int(N * 0.9)]
             test[column] = embeddings[:, c][int(N * 0.9):]
 
-    train_mean = train.mean()
-    train_std = train.std()
-    train = ((train - train_mean) / train_std).dropna()
-    val = ((val - train_mean) / train_std).dropna()
-    test = ((test - train_mean) / train_std).dropna()
-    return train, val, test
+    return train.dropna(), val.dropna(), test.dropna()
 
 
 train_df, val_df, test_df = get_dataset(n_comp=20)
