@@ -7,7 +7,7 @@
 .idea/rSettings.xml
 .ipynb_checkpoints/
 __pycache__/
-tmp/
+tmp/uncased_L-24_H-1024_A-16
 venv/
 .idea/vcs.xml
 .env
